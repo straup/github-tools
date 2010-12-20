@@ -26,7 +26,7 @@ def clone_github(user, clonedir):
             cmd = "git pull origin master"
         else:
             os.chdir(clonedir)
-            cmd = "git clone git@github.com:%s/%s.git" % (user, r['name'])
+            cmd = "git clone git://github.com/%s/%s.git" % (user, r['name'])
 
         # Aren't there python git libraries for doing this?
 
