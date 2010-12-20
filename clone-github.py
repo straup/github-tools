@@ -31,7 +31,7 @@ def clone_github(user, clonedir):
         # Aren't there python git libraries for doing this?
 
         (status, output) = commands.getstatusoutput(cmd)
-        print "%s : %s" % (cmd, status)
+        print "[%s] %s : %s" % (r['name'], cmd, status)
 
 if __name__ == '__main__' :
 
