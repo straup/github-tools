@@ -6,6 +6,7 @@ import json
 import urllib
 import logging
 import subprocess
+import types
 
 def clone_repo(repo, outdir):
 
@@ -77,7 +78,16 @@ def clone_list(user, outdir, skip=[]):
         
         for repo in data:
 
-            if repo['name'] in skip:
+            if not type(repo) == types.DictType:
+                print "WTF is %s" % repo
+                continue
+
+            name = repo.get('name', None)
+
+            if not name:
+                continue
+
+            if name in skip:
                 continue
 
             try:
