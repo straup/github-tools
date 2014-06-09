@@ -13,10 +13,11 @@ def clone_repo(repo, outdir):
     logging.info("clone %s to %s" % (repo['name'], path))
 
     if os.path.isdir(path):
+
         os.chdir(path)
 
         args = [
-            "git"
+            "git",
             "pull",
             "origin",
             "master"
@@ -32,8 +33,8 @@ def clone_repo(repo, outdir):
             ]
 
     rsp = subprocess.check_call(args)
-    print rsp
-
+    logging.debug(rsp)
+    
 def clone_list(user, outdir, skip=[]):
 
     # because, stupid... so insanely stupid
@@ -79,7 +80,10 @@ def clone_list(user, outdir, skip=[]):
             if repo['name'] in skip:
                 continue
 
-            clone_repo(repo, outdir)
+            try:
+                clone_repo(repo, outdir)
+            except Exception, e:
+                logging.error(e)
 
 
 if __name__ == '__main__':
