@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+import pprint
 import os
 import os.path
 import json
@@ -18,7 +20,9 @@ class gethub:
 
         path = os.path.join(outdir, repo['name'])
         logging.info("clone %s to %s" % (repo['name'], path))
-        
+
+        ssh_url = repo['ssh_url']
+
         if os.path.isdir(path):
 
             os.chdir(path)
@@ -32,18 +36,15 @@ class gethub:
 
         else:
 
-            # this still doesn't work for private repos
-            # because... shell/env nonsense (20140610/straup)
-
             args = [
                 "git",
                 "clone",
-                repo['git_url'],
+                ssh_url,
                 path
             ]
-
-            rsp = subprocess.check_call(args)
-            logging.debug(rsp)
+        
+        logging.info(" ".join(args))
+        rsp = subprocess.check_call(args)
 
     # to do: clone_organization
 
@@ -107,8 +108,7 @@ class gethub:
                     self.clone_repo(repo, outdir)
                 except Exception, e:
                     logging.error(e)
-
-
+                    
 if __name__ == '__main__':
 
     import optparse
@@ -134,4 +134,4 @@ if __name__ == '__main__':
     gh = gethub()
     gh.clone_user(opts.token, opts.outdir, args)
 
-
+    sys.exit()
