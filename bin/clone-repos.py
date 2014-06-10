@@ -32,6 +32,9 @@ class gethub:
 
         else:
 
+            # this still doesn't work for private repos
+            # because... shell/env nonsense (20140610/straup)
+
             args = [
                 "git",
                 "clone",
