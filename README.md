@@ -2,7 +2,7 @@
 
 ## clone-repos.py
 
-A 5-minute script to clone/pull all a user's (public) repos (in read-only mode) to a local directory. Needs auth-y hooks for private repositories. This is basically just a safe guard and has no bells. Or whistles.
+A simple script to clone a user's or an organization's public and private repositories. Requires a [personal API token](https://github.com/blog/1509-personal-api-tokens).
 
 ### Cloning your own repositories
 
