@@ -62,7 +62,7 @@ class gethub:
             
             url = src
             logging.debug("fetch %s" % url)
-            
+
             try:
                 rsp = requests.get(url, auth=(self.token, ''), stream=True)
             except Exception, e:
@@ -91,8 +91,8 @@ class gethub:
                 if next:
                     next = next.replace("<", "")
                     next = next.replace(">", "")
-                    src = next
 
+                src = next
                 break
 
             try:
