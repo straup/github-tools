@@ -13,8 +13,8 @@ import requests
 
 class gethub:
     
-    def __init__(self):
-        pass
+    def __init__(self, token):
+        self.token = token
 
     def clone_repo(self, repo, outdir):
 
@@ -46,19 +46,25 @@ class gethub:
         logging.info(" ".join(args))
         rsp = subprocess.check_call(args)
 
-    # to do: clone_organization
+    def clone_user(self, outdir, skip=[]):
 
-    def clone_user(self, token, outdir, skip=[]):
+        src = "https://api.github.com/user/repos"
+        return self.clone_source(src, outdir, skip)
 
-        next = "https://api.github.com/user/repos"
+    def clone_organization(self, org, outdir, skip=[]):
 
-        while next:
+        src = "https://api.github.com/orgs/%s/repos" % org
+        return self.clone_source(src, outdir, skip)
+
+    def clone_source(self, src, outdir, skip=[]):
+
+        while src:
             
-            url = next
+            url = src
             logging.debug("fetch %s" % url)
             
             try:
-                rsp = requests.get(url, auth=(token, ''), stream=True)
+                rsp = requests.get(url, auth=(self.token, ''), stream=True)
             except Exception, e:
                 logging.error("Failed to retrieve %s, because %s" % (url, e))
                 return False
@@ -76,6 +82,7 @@ class gethub:
             links = {}
 
             for rel in rels:
+
                 rel = rel.split('; ')
                 links[rel[1]] = rel[0]
                 
@@ -84,7 +91,7 @@ class gethub:
                 if next:
                     next = next.replace("<", "")
                     next = next.replace(">", "")
-                    logging.debug("next is %s" % next)
+                    src = next
 
                 break
 
@@ -118,6 +125,7 @@ if __name__ == '__main__':
 
     parser.add_option('--token', dest='token', action='store', help='')
     parser.add_option('--outdir', dest='outdir', action='store', help='')
+    parser.add_option('--organization', dest='organization', action='store', help='')
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="enable chatty logging; default is false", default=False)
 
     (opts, args) = parser.parse_args()
@@ -131,7 +139,11 @@ if __name__ == '__main__':
         logging.error("%s is not a directory" % opts.outdir)
         sys.exit()
 
-    gh = gethub()
-    gh.clone_user(opts.token, opts.outdir, args)
+    gh = gethub(opts.token)
+
+    if opts.organization:
+        gh.clone_organization(opts.organization, opts.outdir, args)
+    else:
+        gh.clone_user(opts.outdir, args)
 
     sys.exit()
