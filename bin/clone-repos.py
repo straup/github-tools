@@ -13,8 +13,9 @@ import requests
 
 class gethub:
     
-    def __init__(self, token):
+    def __init__(self, token, **kwargs):
         self.token = token
+        self.exclude = kwargs.get('exclude', [])
 
     def clone_repo(self, repo, outdir):
 
@@ -46,17 +47,17 @@ class gethub:
         logging.info(" ".join(args))
         rsp = subprocess.check_call(args)
 
-    def clone_user(self, outdir, skip=[]):
+    def clone_user(self, outdir):
 
         src = "https://api.github.com/user/repos"
-        return self.clone_source(src, outdir, skip)
+        return self.clone_source(src, outdir)
 
-    def clone_organization(self, org, outdir, skip=[]):
+    def clone_organization(self, org, outdir):
 
         src = "https://api.github.com/orgs/%s/repos" % org
-        return self.clone_source(src, outdir, skip)
+        return self.clone_source(src, outdir)
 
-    def clone_source(self, src, outdir, skip=[]):
+    def clone_source(self, src, outdir):
 
         while src:
             
@@ -108,7 +109,7 @@ class gethub:
                 if not name:
                     continue
                 
-                if name in skip:
+                if name in self.exclude:
                     continue
 
                 try:
@@ -128,7 +129,7 @@ if __name__ == '__main__':
     parser.add_option('--organization', dest='organization', action='store', help='')
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="enable chatty logging; default is false", default=False)
 
-    (opts, args) = parser.parse_args()
+    (opts, to_skip) = parser.parse_args()
 
     if opts.verbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -139,11 +140,11 @@ if __name__ == '__main__':
         logging.error("%s is not a directory" % opts.outdir)
         sys.exit()
 
-    gh = gethub(opts.token)
+    gh = gethub(opts.token, exclude=to_skip)
 
     if opts.organization:
-        gh.clone_organization(opts.organization, opts.outdir, args)
+        gh.clone_organization(opts.organization, opts.outdir)
     else:
-        gh.clone_user(opts.outdir, args)
+        gh.clone_user(opts.outdir)
 
     sys.exit()
