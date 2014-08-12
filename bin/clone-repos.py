@@ -120,11 +120,14 @@ class gethub:
 if __name__ == '__main__':
 
     import optparse
+    import ConfigParser
+
     parser = optparse.OptionParser()
 
     # sudo read from config file...
 
     parser.add_option('--token', dest='token', action='store', help='')
+    parser.add_option('--config', dest='config', action='store', help='')
     parser.add_option('--outdir', dest='outdir', action='store', help='')
     parser.add_option('--organization', dest='organization', action='store', help='')
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="enable chatty logging; default is false", default=False)
@@ -140,7 +143,19 @@ if __name__ == '__main__':
         logging.error("%s is not a directory" % opts.outdir)
         sys.exit()
 
-    gh = gethub(opts.token, exclude=to_skip)
+    token = opts.token
+
+    if opts.config:
+
+        if not os.path.exists(opts.config):
+            logging.error("%s does not exist" % opts.config)
+            sys.exit()
+
+        cfg = ConfigParser.ConfigParser()
+        cfg.read(opts.config)
+        token = cfg.get('github', 'token')
+
+    gh = gethub(token, exclude=to_skip)
 
     if opts.organization:
         gh.clone_organization(opts.organization, opts.outdir)
